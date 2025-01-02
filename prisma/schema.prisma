@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(cuid())
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Colleges {
+  id       String   @id @default(cuid())
+  name     String   @unique
+  score    Int      @default(0)
+  city     Cities   @relation(fields: [city_id], references: [id])
+  city_id  String
+  state    States   @relation(fields: [state_id], references: [id])
+  state_id String
+  courses  CollegeWiseCourse[]
+  placements CollegePlacement[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CollegePlacement {
+  id       String   @id @default(cuid())
+  college  Colleges @relation(fields: [college_id], references: [id])
+  college_id String
+  year       Int
+  highest_placement Float
+  average_placement Float
+  median_placement Float
+  placement_rate Float
+}
+
+model CollegeWiseCourse {
+  id       String   @id @default(cuid())
+  college  Colleges @relation(fields: [college_id], references: [id])
+  college_id String
+  course_name String
+  course_duration Int
+  course_fee Int
+}
+
+model Cities {
+  id      String   @id @default(cuid())
+  name     String   @unique
+  colleges Colleges[]
+}
+
+model States {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  colleges Colleges[]
+}
+
+model Product {
+  id       String   @id @default(cuid())
+  name     String   @unique
+  price    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
